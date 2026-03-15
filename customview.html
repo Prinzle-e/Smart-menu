@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taste | Digital Menu</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #fff5f2; scroll-behavior: smooth; }
+        .glass { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.4); }
+        .food-card img { filter: drop-shadow(0 15px 20px rgba(0,0,0,0.1)); }
+    </style>
+</head>
+<body class="pb-24">
+
+    <header class="p-8 max-w-md mx-auto relative overflow-hidden">
+        <h1 class="text-4xl font-extrabold text-slate-900 leading-tight">Fresh Food <br> Ready for You</h1>
+        <p class="text-slate-500 mt-2 text-sm">Scan. Order. Enjoy.</p>
+        <img src="https://pngimg.com/uploads/breakfast/breakfast_PNG48.png" class="absolute -right-16 -top-4 w-48 opacity-20 pointer-events-none">
+    </header>
+
+    <main class="max-w-md mx-auto px-6">
+        <div id="menu-container" class="grid grid-cols-2 gap-x-4 gap-y-12 mt-10">
+            </div>
+    </main>
+
+    <div class="fixed bottom-6 left-0 right-0 px-6 z-50">
+        <div class="glass max-w-xs mx-auto py-4 px-10 rounded-full shadow-2xl flex justify-between items-center">
+            <button onclick="window.scrollTo(0,0)" class="text-orange-600 scale-125">🏠</button>
+            <button onclick="alert('Cart coming in next update!')" class="text-slate-400">🛒</button>
+            <button onclick="alert('Profile feature coming soon')" class="text-slate-400">👤</button>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://objfcxelxmdsmvxxgdir.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9iamZjeGVseG1kc212eHhnZGlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzOTA5MTgsImV4cCI6MjA4ODk2NjkxOH0.fxqJ_qFDJEGjcCjioJV2zIYR9F8c59v2blg7uVy9T50';
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        async function loadMenu() {
+            const container = document.getElementById('menu-container');
+            // Fetch only available items
+            const { data, error } = await supabase
+                .from('menu_items')
+                .select('*')
+                .eq('is_available', true)
+                .order('name', { ascending: true });
+
+            if (error) { container.innerHTML = "Error loading menu."; return; }
+
+            container.innerHTML = data.map(item => `
+                <div class="glass food-card p-3 rounded-[2rem] relative flex flex-col items-center">
+                    <img src="${item.image_url || 'https://via.placeholder.com/150'}" 
+                         class="w-24 h-24 object-cover rounded-full -mt-10 mb-2 shadow-lg">
+                    <h3 class="font-bold text-sm text-center text-slate-800 h-10 overflow-hidden line-clamp-2">${item.name}</h3>
+                    <p class="font-black text-orange-600 mt-2 text-md">₦${item.price.toLocaleString()}</p>
+                </div>
+            `).join('');
+        }
+
+        loadMenu();
+    </script>
+</body>
+</html>
